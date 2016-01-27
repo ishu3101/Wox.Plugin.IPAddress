@@ -1,0 +1,12 @@
+{
+    "ID":"E2D2C23B084D41D1B6F60EC79D62CAH6",
+    "ActionKeyword":"ipadr",
+    "Name":"IP Address",
+    "Description":"Shows your internal and external IP address",
+    "Author":"ishu3101",
+    "Version":"1.0.0",
+    "Language":"csharp",
+    "Website":"http://www.github.com/ishu3101/Wox.Plugin.IPAddress",
+    "ExecuteFileName":"Wox.Plugin.IPAddress.dll",
+    "IcoPath": "ipaddress.png"
+}
