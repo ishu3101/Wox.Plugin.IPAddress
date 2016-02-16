@@ -25,13 +25,13 @@ namespace Wox.Plugin.IPAddress
 
             String icon = "ipaddress.png";
 
-            results.Add(Item(IP, "Local IP Address ", icon, Action(IP)));
-            results.Add(Item(externalip, "External IP Address ", icon, Action(externalip)));
+            results.Add(Result(IP, "Local IP Address ", icon, Action(IP)));
+            results.Add(Result(externalip, "External IP Address ", icon, Action(externalip)));
 
             return results;
         }
         // relative path to your plugin directory
-        private static Result Item(String title, String subtitle, String icon, Func<ActionContext, bool> action)
+        private static Result Result(String title, String subtitle, String icon, Func<ActionContext, bool> action)
         {
             return new Result()
             {
