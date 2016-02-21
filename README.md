@@ -1,5 +1,5 @@
 # Wox.Plugin.IPAddress
-A Wox Plugin that shows your internal and external IP address
+[Wox.Plugin.IPAddress](http://www.getwox.com/plugin/43) is a Wox Plugin that shows your internal and external IP address
 
 ![Screenshot](screenshot.png)
 
