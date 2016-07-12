@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
-using System.Net.NetworkInformation;
 
 namespace Wox.Plugin.IPAddress
 {
@@ -13,25 +10,30 @@ namespace Wox.Plugin.IPAddress
         public void Init(PluginInitContext context) { }
         public List<Result> Query(Query query)
         {
-            List<Result> results = new List<Result>();
+            var results = new List<Result>();
 
-            String hostname = Dns.GetHostName();
+            var hostname = Dns.GetHostName();
 
-            // Get the Local IP Address
-            String IP = Dns.GetHostByName(hostname).AddressList[0].ToString();
+
 
             // Get the External IP Address
-            String externalip = new WebClient().DownloadString("http://ipecho.net/plain");
+            var externalip = new WebClient().DownloadString("http://ipecho.net/plain");
 
-            String icon = "ipaddress.png";
+            const string icon = "ipaddress.png";
 
-            results.Add(Result(IP, "Local IP Address ", icon, Action(IP)));
+            // Get the Local IP Address
+            foreach (var ip in Dns.GetHostEntry(hostname).AddressList)
+            {
+
+                results.Add(Result(ip.ToString(), ip.AddressFamily.ToString(), icon, Action(ip.ToString())));
+            }
+
             results.Add(Result(externalip, "External IP Address ", icon, Action(externalip)));
 
             return results;
         }
         // relative path to your plugin directory
-        private static Result Result(String title, String subtitle, String icon, Func<ActionContext, bool> action)
+        private static Result Result(string title, string subtitle, string icon, Func<ActionContext, bool> action)
         {
             return new Result()
             {
@@ -43,7 +45,7 @@ namespace Wox.Plugin.IPAddress
         }
 
         // The Action method is called after the user selects the item
-        private static Func<ActionContext, bool> Action(String text)
+        private static Func<ActionContext, bool> Action(string text)
         {
             return e =>
             {
@@ -54,7 +56,7 @@ namespace Wox.Plugin.IPAddress
             };
         }
 
-        public static void CopyToClipboard(String text)
+        public static void CopyToClipboard(string text)
         {
             Clipboard.SetText(text);
         }
