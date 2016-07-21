@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.NetworkInformation;
 
 namespace Wox.Plugin.IPAddress
 {
@@ -14,20 +15,32 @@ namespace Wox.Plugin.IPAddress
 
             var hostname = Dns.GetHostName();
 
-
-
             // Get the External IP Address
-            var externalip = new WebClient().DownloadString("http://ipecho.net/plain");
+
 
             const string icon = "ipaddress.png";
-
-            // Get the Local IP Address
-            foreach (var ip in Dns.GetHostEntry(hostname).AddressList)
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
             {
-
-                results.Add(Result(ip.ToString(), ip.AddressFamily.ToString(), icon, Action(ip.ToString())));
+                if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                    || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                {
+                    //Console.WriteLine(ni.Name);
+                    foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            //Console.WriteLine(ip.Address.ToString());
+                            results.Add(
+                                Result(ip.Address.ToString(),
+                                ni.Name,
+                                icon, Action(ip.Address.ToString())));
+                        }
+                    }
+                }
             }
 
+
+            var externalip = new WebClient().DownloadString("http://ipecho.net/plain");
             results.Add(Result(externalip, "External IP Address ", icon, Action(externalip)));
 
             return results;
