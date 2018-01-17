@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 
@@ -13,25 +11,42 @@ namespace Wox.Plugin.IPAddress
         public void Init(PluginInitContext context) { }
         public List<Result> Query(Query query)
         {
-            List<Result> results = new List<Result>();
+            var results = new List<Result>();
 
-            String hostname = Dns.GetHostName();
-
-            // Get the Local IP Address
-            String IP = Dns.GetHostByName(hostname).AddressList[0].ToString();
+            var hostname = Dns.GetHostName();
 
             // Get the External IP Address
-            String externalip = new WebClient().DownloadString("http://ipecho.net/plain");
 
-            String icon = "ipaddress.png";
 
-            results.Add(Result(IP, "Local IP Address ", icon, Action(IP)));
+            const string icon = "ipaddress.png";
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (ni.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                    || ni.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                {
+                    //Console.WriteLine(ni.Name);
+                    foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            //Console.WriteLine(ip.Address.ToString());
+                            results.Add(
+                                Result(ip.Address.ToString(),
+                                ni.Name,
+                                icon, Action(ip.Address.ToString())));
+                        }
+                    }
+                }
+            }
+
+
+            var externalip = new WebClient().DownloadString("http://ipecho.net/plain");
             results.Add(Result(externalip, "External IP Address ", icon, Action(externalip)));
 
             return results;
         }
         // relative path to your plugin directory
-        private static Result Result(String title, String subtitle, String icon, Func<ActionContext, bool> action)
+        private static Result Result(string title, string subtitle, string icon, Func<ActionContext, bool> action)
         {
             return new Result()
             {
@@ -43,7 +58,7 @@ namespace Wox.Plugin.IPAddress
         }
 
         // The Action method is called after the user selects the item
-        private static Func<ActionContext, bool> Action(String text)
+        private static Func<ActionContext, bool> Action(string text)
         {
             return e =>
             {
@@ -54,7 +69,7 @@ namespace Wox.Plugin.IPAddress
             };
         }
 
-        public static void CopyToClipboard(String text)
+        public static void CopyToClipboard(string text)
         {
             Clipboard.SetText(text);
         }
